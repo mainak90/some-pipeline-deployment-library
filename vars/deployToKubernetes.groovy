@@ -1,6 +1,6 @@
 #!/usr/bin/groovy
 def call(String application, String namespace){
-        String fullpath = "manifest/$application"
+        String fullpath = "manifest/$application/"
         def namespaceExists = sh returnStatus: true, script: "microk8s.kubectl get namespace $namespace"
         if (namespaceExists != 0) {
             echo "Namespace $namespace does not exist, creating namespace"
