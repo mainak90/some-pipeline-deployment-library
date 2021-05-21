@@ -32,7 +32,6 @@ class Release implements Serializable {
         return properties
     }
 
-    @NonCPS
     def releaseAllFromProperties(){
         def properties = steps.readProperties file: "app.properties"
         if (properties['app'] == "docker") {
