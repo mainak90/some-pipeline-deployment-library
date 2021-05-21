@@ -54,16 +54,18 @@ def call(){
                     }
                 }
             }
+        }
 
-            post {
-                always {
-                    cleanWs()
+        post {
+            always {
+                cleanWs()
+            }
+            failure {
+                script {
+                    env.logs = currentBuild.rawBuild.getLog(50).join('\n')
                 }
-                failure {
-                    script {
-                        env.logs = currentBuild.rawBuild.getLog(50).join('\n')
-                    }
-                }
+
             }
         }
+    }
 }
