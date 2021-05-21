@@ -62,7 +62,7 @@ class Release implements Serializable {
                 steps.currentBuild.result = 'FAILURE'
             }
         } else {
-            echo "Namespace $namespace exists!"
+            steps.echo "Namespace $namespace exists!"
         }
         def projectExists = steps.sh(returnStatus: true, script: "microk8s.kubectl get deployment $application -n $namespace")
         if (projectExists != 0) {
