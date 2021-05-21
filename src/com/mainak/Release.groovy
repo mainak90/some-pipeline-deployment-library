@@ -59,7 +59,7 @@ class Release implements Serializable {
                 steps.sh "microk8s.kubectl create namespace $namespace"
             } catch (Exception ex) {
                 error(ex.toString())
-                currentBuild.result = 'FAILURE'
+                steps.currentBuild.result = 'FAILURE'
             }
         } else {
             echo "Namespace $namespace exists!"
@@ -71,7 +71,7 @@ class Release implements Serializable {
                 steps.sh "microk8s.kubectl create -f $fullpath -n $namespace"
             } catch (Exception ex) {
                 error(ex.toString())
-                currentBuild.result = 'UNSTABLE'
+                steps.currentBuild.result = 'UNSTABLE'
             }
         } else {
             steps.echo "Project $application exists in namespace $namespace"
@@ -79,7 +79,7 @@ class Release implements Serializable {
                 steps.sh "microk8s.kubectl apply -f $fullpath -n $namespace"
             } catch (Exception ex) {
                 error(ex.toString())
-                currentBuild.result = 'UNSTABLE'
+                steps.currentBuild.result = 'UNSTABLE'
             }
         }
     }
@@ -95,10 +95,10 @@ class Release implements Serializable {
         steps.echo "Running unit tests..."
         try {
             steps.sh "container-structure-test test --image $projectname:$version --config $testfile"
-            currentBuild.result = 'SUCCESS'
+            steps.currentBuild.result = 'SUCCESS'
         } catch (Exception ex){
             error(ex.toString())
-            currentBuild.result = 'FAILURE'
+            steps.currentBuild.result = 'FAILURE'
         }
     }
 
