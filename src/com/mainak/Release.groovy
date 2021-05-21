@@ -25,7 +25,6 @@ class Release implements Serializable {
 
     @NonCPS
     def loadProperties() {
-        echo "Loading file app.properties to set properties"
         Properties properties = new Properties()
         this.getClass().getResource('/app.properties').withInputStream {
             properties.load(it)
