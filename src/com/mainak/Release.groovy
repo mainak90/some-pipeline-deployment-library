@@ -33,7 +33,7 @@ class Release implements Serializable {
     }
 
     def releaseAllFromProperties(){
-        def properties = steps.readProperties file: "app.properties"
+        def properties = readProperties file: "app.properties"
         if (properties['app'] == "docker") {
             dockerBuildAndTest(properties['project'], '.', properties['testfile'])
         }
