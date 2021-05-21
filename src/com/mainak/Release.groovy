@@ -26,12 +26,26 @@ class Release implements Serializable {
     @NonCPS
     def loadProperties() {
         Properties properties = new Properties()
-        this.getClass().getResource('/app.properties').withInputStream {
+        this.getClass().getResource('app.properties').withInputStream {
             properties.load(it)
         }
         return properties
     }
 
+    @NonCPS
+    def releaseAllFromProperties(String filepath){
+        def properties = readProperties  file: filepath
+        if (properties['app'] == "docker") {
+            dockerBuildAndTest(properties['project'], properties['dockerfile'], properties['testfile'])
+        }
+        boolean prod
+        if (properties['prod'] == 'False') {
+            prod = false
+        } else {
+            prod = true
+        }
+        deployToK8s(properties['project'], properties['namespace'], prod)
+    }
 
     @NonCPS
     def deployToK8s(String application, String namespace, boolean Prod){
