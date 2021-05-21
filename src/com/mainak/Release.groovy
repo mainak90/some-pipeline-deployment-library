@@ -56,19 +56,19 @@ class Release implements Serializable {
         if (namespaceExists != 0) {
             echo "Namespace $namespace does not exist, creating namespace"
             try {
-                sh "microk8s.kubectl create namespace $namespace"
+                steps.sh "microk8s.kubectl create namespace $namespace"
             } catch (Exception ex) {
                 error(ex.toString())
                 currentBuild.result = 'FAILURE'
             }
-        } else {
+        } else {""
             echo "Namespace $namespace exists!"
         }
         def projectExists = sh returnStatus: true, script: "microk8s.kubectl get deployment $application -n $namespace"
         if (projectExists != 0) {
             echo "Project $application does not exist, creating deployment $application"
             try {
-                sh "microk8s.kubectl create -f $fullpath -n $namespace"
+                steps.sh "microk8s.kubectl create -f $fullpath -n $namespace"
             } catch (Exception ex) {
                 error(ex.toString())
                 currentBuild.result = 'UNSTABLE'
@@ -76,7 +76,7 @@ class Release implements Serializable {
         } else {
             echo "Project $application exists in namespace $namespace"
             try {
-                sh "microk8s.kubectl apply -f $fullpath -n $namespace"
+                steps.sh "microk8s.kubectl apply -f $fullpath -n $namespace"
             } catch (Exception ex) {
                 error(ex.toString())
                 currentBuild.result = 'UNSTABLE'
@@ -89,12 +89,12 @@ class Release implements Serializable {
         def version = steps.readFile 'VERSION'
         echo "Build version : $version"
         echo "Trigerring the build..."
-        sh "docker build -t $projectname:$version $dockerfilepath"
-        sh "docker save $projectname:$version > ${projectname}-${version}.tar"
-        sh "microk8s ctr image import ${projectname}-${version}.tar"
+        steps.sh "docker build -t $projectname:$version $dockerfilepath"
+        steps.sh "docker save $projectname:$version > ${projectname}-${version}.tar"
+        steps.sh "microk8s ctr image import ${projectname}-${version}.tar"
         echo "Running unit tests..."
         try {
-            sh "container-structure-test test --image $projectname:$version --config $testfile"
+            steps.sh "container-structure-test test --image $projectname:$version --config $testfile"
             currentBuild.result = 'SUCCESS'
         } catch (Exception ex){
             error(ex.toString())
