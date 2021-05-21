@@ -26,8 +26,7 @@ class Release implements Serializable {
     @NonCPS
     def loadProperties(String filepath) {
         Properties properties = new Properties()
-        File propertiesFile = new File(filepath)
-        propertiesFile.withInputStream {
+        this.getClass().getResource(filepath).withInputStream {
             properties.load(it)
         }
         return properties
