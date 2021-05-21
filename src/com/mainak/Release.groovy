@@ -32,6 +32,24 @@ class Release implements Serializable {
         return properties
     }
 
+    def overrideAndRelease(String filepath, Map input){
+        def properties = steps.readProperties file: filepath
+        if (properties['namespace'] == input.namespace && properties['prod'] == input.prod) {
+            releaseAllFromProperties(filepath)
+        } else {
+            if (properties['app'] == "docker") {
+                dockerBuildAndTest(properties['project'], '.', properties['testfile'])
+            }
+            boolean prod
+            if (input.prod == 'False') {
+                prod = false
+            } else {
+                prod = true
+            }
+            deployToK8s(properties['project'], input.namespace, prod)
+        }
+    }
+
     def releaseAllFromProperties(String filepath){
         def properties = steps.readProperties file: filepath
         if (properties['app'] == "docker") {
