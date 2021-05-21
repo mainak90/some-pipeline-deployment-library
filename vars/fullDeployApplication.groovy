@@ -42,7 +42,7 @@ def call(){
                         input.namespace = "${params.namespace}"
                         input.prod = "${params.prod}"
                         def rel = new Release(this)
-                        rel.overrideAndRelease(input,"${params.filepath}")
+                        rel.overrideAndRelease("${params.filepath}",input)
                     }
                 }
             }
