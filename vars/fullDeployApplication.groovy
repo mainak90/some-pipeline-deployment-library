@@ -15,12 +15,34 @@ def call(Map input, String filepath){
                 timestamps()
             }
 
+            parameters {
+                string(
+                        name: 'namespace',
+                        defaultValue: 'default',
+                        description: 'The namespace to deploy to'
+                )
+                choice(
+                        name: 'prod',
+                        choices: ["False", "True"],
+                        description: "Deploy to prod or not"
+                )
+                string(
+                        name: 'filepath',
+                        defaultValue: 'app.properties',
+                        description: 'Path to the property file'
+                )
+            }
+
             stages {
+
                 stage('Check and deploy namespace') {
                     steps {
                         script {
+                            def input = [:]
+                            input.namespace = "${params.namespace}"
+                            input.prod = "${params.prod}"
                             def rel = new Release(this)
-                            rel.overrideAndRelease(input,filepath)
+                            rel.overrideAndRelease(input,"${params.filepath}")
                         }
                     }
                 }
