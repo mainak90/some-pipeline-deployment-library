@@ -86,7 +86,7 @@ class Release implements Serializable {
 
     @NonCPS
     def dockerBuildAndTest(String projectname, String dockerfilepath = ".", String testfile) {
-        def version = readFile 'VERSION'
+        def version = steps.readFile 'VERSION'
         echo "Build version : $version"
         echo "Trigerring the build..."
         sh "docker build -t $projectname:$version $dockerfilepath"
