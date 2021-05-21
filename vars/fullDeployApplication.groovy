@@ -1,3 +1,4 @@
+#!/usr/bin/groovy
 import com.mainak.Release
 
 def call(){
