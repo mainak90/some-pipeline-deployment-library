@@ -11,7 +11,7 @@ def call(String projectname, String dockerfilepath = ".", String testfile) {
         sh "container-structure-test test --image $projectname:$version --config $testfile"
         currentBuild.result = 'SUCCESS'
     } catch (Exception ex){
-        error(ex.toString())
+        echo 'Exception occurred: ' + ex.toString()
         currentBuild.result = 'FAILURE'
     }
 }

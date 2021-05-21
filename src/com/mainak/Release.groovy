@@ -76,7 +76,7 @@ class Release implements Serializable {
             try {
                 steps.sh "microk8s.kubectl create namespace $namespace"
             } catch (Exception ex) {
-                error(ex.toString())
+                steps.echo 'Exception occurred: ' + ex.toString()
                 steps.currentBuild.result = 'FAILURE'
             }
         } else {
@@ -88,7 +88,7 @@ class Release implements Serializable {
             try {
                 steps.sh "microk8s.kubectl create -f $fullpath -n $namespace"
             } catch (Exception ex) {
-                error(ex.toString())
+                steps.echo 'Exception occurred: ' + ex.toString()
                 steps.currentBuild.result = 'UNSTABLE'
             }
         } else {
@@ -96,7 +96,7 @@ class Release implements Serializable {
             try {
                 steps.sh "microk8s.kubectl apply -f $fullpath -n $namespace"
             } catch (Exception ex) {
-                error(ex.toString())
+                steps.echo 'Exception occurred: ' + ex.toString()
                 steps.currentBuild.result = 'UNSTABLE'
             }
         }
@@ -115,7 +115,7 @@ class Release implements Serializable {
             steps.sh "container-structure-test test --image $projectname:$version --config $testfile"
             steps.currentBuild.result = 'SUCCESS'
         } catch (Exception ex){
-            error(ex.toString())
+            steps.echo 'Exception occurred: ' + ex.toString()
             steps.currentBuild.result = 'FAILURE'
         }
     }

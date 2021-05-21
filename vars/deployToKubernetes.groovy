@@ -7,7 +7,7 @@ def call(String application, String namespace){
             try {
                 sh "microk8s.kubectl create namespace $namespace"
             } catch (Exception ex) {
-                error(ex.toString())
+                echo 'Exception occurred: ' + ex.toString()
                 currentBuild.result = 'FAILURE'
             }
         } else {
@@ -19,7 +19,7 @@ def call(String application, String namespace){
             try {
                 sh "microk8s.kubectl create -f $fullpath -n $namespace"
             } catch (Exception ex) {
-                error(ex.toString())
+                echo 'Exception occurred: ' + ex.toString()
                 currentBuild.result = 'UNSTABLE'
             }
         } else {
@@ -27,7 +27,7 @@ def call(String application, String namespace){
             try {
                 sh "microk8s.kubectl apply -f $fullpath -n $namespace"
             } catch (Exception ex) {
-                error(ex.toString())
+                echo 'Exception occurred: ' + ex.toString()
                 currentBuild.result = 'UNSTABLE'
             }
         }
