@@ -32,6 +32,7 @@ class Release implements Serializable {
         return properties
     }
 
+    @NonCPS
     def releaseAllFromProperties(){
         def properties = steps.readProperties file: "app.properties"
         if (properties['app'] == "docker") {
@@ -46,7 +47,7 @@ class Release implements Serializable {
         deployToK8s(properties['project'], properties['namespace'], prod)
     }
 
-    @NonCPS
+
     def deployToK8s(String application, String namespace, boolean Prod){
         String fullpath = "manifest/$application/"
         if (Prod) {
@@ -84,7 +85,7 @@ class Release implements Serializable {
         }
     }
 
-    @NonCPS
+
     def dockerBuildAndTest(String projectname, String dockerfilepath = ".", String testfile) {
         def version = readFile(file: 'VERSION')
         echo "Build version : $version"
