@@ -1,6 +1,6 @@
 import com.mainak.Release
 
-def call(){
+def call(String filepath){
     def rel = new Release(this)
-    rel.releaseAllFromProperties()
+    rel.releaseAllFromProperties(filepath)
 }
