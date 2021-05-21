@@ -54,7 +54,7 @@ class Release implements Serializable {
         }
         def namespaceExists = steps.sh(returnStatus: true, script: "microk8s.kubectl get namespace $namespace")
         if (namespaceExists != 0) {
-            echo "Namespace $namespace does not exist, creating namespace"
+            steps.echo" "Namespace $namespace does not exist, creating namespace"
             try {
                 steps.sh "microk8s.kubectl create namespace $namespace"
             } catch (Exception ex) {
@@ -66,7 +66,7 @@ class Release implements Serializable {
         }
         def projectExists = steps.sh(returnStatus: true, script: "microk8s.kubectl get deployment $application -n $namespace")
         if (projectExists != 0) {
-            echo "Project $application does not exist, creating deployment $application"
+            steps.echo "Project $application does not exist, creating deployment $application"
             try {
                 steps.sh "microk8s.kubectl create -f $fullpath -n $namespace"
             } catch (Exception ex) {
@@ -74,7 +74,7 @@ class Release implements Serializable {
                 currentBuild.result = 'UNSTABLE'
             }
         } else {
-            echo "Project $application exists in namespace $namespace"
+            steps.echo "Project $application exists in namespace $namespace"
             try {
                 steps.sh "microk8s.kubectl apply -f $fullpath -n $namespace"
             } catch (Exception ex) {
@@ -87,12 +87,12 @@ class Release implements Serializable {
 
     def dockerBuildAndTest(String projectname, String dockerfilepath = ".", String testfile) {
         def version = steps.readFile 'VERSION'
-        echo "Build version : $version"
-        echo "Trigerring the build..."
+        steps.echo "Build version : $version"
+        steps.echo "Trigerring the build..."
         steps.sh "docker build -t $projectname:$version $dockerfilepath"
         steps.sh "docker save $projectname:$version > ${projectname}-${version}.tar"
         steps.sh "microk8s ctr image import ${projectname}-${version}.tar"
-        echo "Running unit tests..."
+        steps.echo "Running unit tests..."
         try {
             steps.sh "container-structure-test test --image $projectname:$version --config $testfile"
             currentBuild.result = 'SUCCESS'
