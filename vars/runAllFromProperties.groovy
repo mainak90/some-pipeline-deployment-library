@@ -1,8 +1,8 @@
 import com.mainak.Release
 
-def call(String filepath){
+def call(){
     def rel = new Release(this)
-    def properties = rel.loadProperties(filepath)
+    def properties = rel.loadProperties()
     if (properties.app == "docker") {
         dockerBuildAndTest(properties.project, properties.dockerfile, properties.testfile)
     }
