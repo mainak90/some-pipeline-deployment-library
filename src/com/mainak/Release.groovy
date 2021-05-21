@@ -34,9 +34,9 @@ class Release implements Serializable {
 
     @NonCPS
     def releaseAllFromProperties(){
-        def properties = readProperties  file: 'app.properties'
+        def properties = readProperties file: 'app.properties'
         if (properties['app'] == "docker") {
-            dockerBuildAndTest(properties['project'], properties['dockerfile'], properties['testfile'])
+            dockerBuildAndTest(properties['project'], '.', properties['testfile'])
         }
         boolean prod
         if (properties['prod'] == 'False') {
