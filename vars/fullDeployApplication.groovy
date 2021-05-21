@@ -1,6 +1,6 @@
 import com.mainak.Release
 
-def call(Map input, String filepath){
+def call(){
     try {
         pipeline {
             agent {
