@@ -37,8 +37,8 @@ def call(){
                     description: "Deploy canary set or not"
             )
             string(
-                    name: 'version'
-                    defaultValue: '0.1.0'
+                    name: 'version',
+                    defaultValue: '0.1.0',
                     description: "Version to deploy, this parameter is only used for production deployment"
             )
         }
