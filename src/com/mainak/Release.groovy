@@ -41,11 +41,7 @@ class Release implements Serializable {
                 dockerBuildAndTest(properties['project'], '.', properties['testfile'])
             }
             boolean prod
-            if (input.prod == 'False') {
-                prod = false
-            } else {
-                prod = true
-            }
+            prod = false
             deployToK8s(properties['project'], input.namespace, prod)
         }
     }
@@ -120,5 +116,90 @@ class Release implements Serializable {
         }
     }
 
+    def getOrBuildImage(String appname, String version, String dockerfilepath = ".") {
+        def imageExists = steps.sh(returnStatus: true, script: "microk8s ctr image list | grep $appname | grep $version")
+        if (imageExists != 0) {
+            steps.echo "Trigerring new image build..."
+            steps.sh "docker build -t $appname:$version $dockerfilepath"
+            steps.sh "docker save $appname:$version > ${appname}-${version}.tar"
+            steps.sh "microk8s ctr image import ${appname}-${version}.tar"
+        } else {
+            steps.echo "Image $appname:$version exists in local registry, preoceeding with release.."
+        }
+    }
+
+    def releaseCanary(String version, String filepath) {
+        def properties = steps.readProperties file: filepath
+        def projectname = properties['project']
+        getOrBuildImage(projectname, version, ".")
+        steps.sh "sed manifest/$projectname/canary/staging/ -type f | xargs sed -i 's/VERSION/$version/g'"
+        def namespaceExists = steps.sh(returnStatus: true, script: "microk8s.kubectl get namespace canary")
+        if (namespaceExists != 0) {
+            steps.echo "Namespace canary does not exist, creating namespace"
+            try {
+                steps.sh "microk8s.kubectl create namespace canary"
+            } catch (Exception ex) {
+                steps.echo 'Exception occurred: ' + ex.toString()
+                steps.currentBuild.result = 'FAILURE'
+            }
+        } else {
+            steps.echo "Namespace canary exists!"
+        }
+        def projectExists = steps.sh(returnStatus: true, script: "microk8s.kubectl get deployment $projectname -n canary")
+        if (projectExists != 0) {
+            steps.echo "Project $projectname does not exist, creating deployment $projectname"
+            try {
+                steps.sh "microk8s.kubectl create -f manifest/$projectname/canary/staging/ -n canary"
+            } catch (Exception ex) {
+                steps.echo 'Exception occurred: ' + ex.toString()
+                steps.currentBuild.result = 'UNSTABLE'
+            }
+        } else {
+            steps.echo "Project $projectname exists in namespace canary"
+            try {
+                steps.sh "microk8s.kubectl apply -f manifest/$projectname/canary/staging/ -n canary"
+            } catch (Exception ex) {
+                steps.echo 'Exception occurred: ' + ex.toString()
+                steps.currentBuild.result = 'UNSTABLE'
+            }
+        }
+    }
+
+    def releaseProduction(String version, String filepath){
+        def properties = steps.readProperties file: filepath
+        def projectname = properties['project']
+        getOrBuildImage(projectname, version, ".")
+        steps.sh "sed manifest/$projectname/canary/prod/ -type f | xargs sed -i 's/VERSION/$version/g'"
+        def namespaceExists = steps.sh(returnStatus: true, script: "microk8s.kubectl get namespace production")
+        if (namespaceExists != 0) {
+            steps.echo "Namespace production does not exist, creating namespace"
+            try {
+                steps.sh "microk8s.kubectl create namespace production"
+            } catch (Exception ex) {
+                steps.echo 'Exception occurred: ' + ex.toString()
+                steps.currentBuild.result = 'FAILURE'
+            }
+        } else {
+            steps.echo "Namespace production exists!"
+        }
+        def projectExists = steps.sh(returnStatus: true, script: "microk8s.kubectl get deployment $projectname -n production")
+        if (projectExists != 0) {
+            steps.echo "Project $projectname does not exist, creating deployment $projectname"
+            try {
+                steps.sh "microk8s.kubectl create -f manifest/$projectname/canary/prod/ -n production"
+            } catch (Exception ex) {
+                steps.echo 'Exception occurred: ' + ex.toString()
+                steps.currentBuild.result = 'UNSTABLE'
+            }
+        } else {
+            steps.echo "Project $projectname exists in namespace production"
+            try {
+                steps.sh "microk8s.kubectl apply -f manifest/$projectname/canary/prod/ -n production"
+            } catch (Exception ex) {
+                steps.echo 'Exception occurred: ' + ex.toString()
+                steps.currentBuild.result = 'UNSTABLE'
+            }
+        }
+    }
 
 }

@@ -31,6 +31,16 @@ def call(){
                     defaultValue: 'app.properties',
                     description: 'Path to the property file'
             )
+            choice(
+                    name: 'canary',
+                    choices: ["False", "True"],
+                    description: "Deploy canary set or not"
+            )
+            string(
+                    name: 'version'
+                    defaultValue: '0.1.0'
+                    description: "Version to deploy, this parameter is only used for production deployment"
+            )
         }
 
         stages {
@@ -47,14 +57,64 @@ def call(){
                 }
             }
 
-            stage('Wait for approval') {
+            stage('Wait for canary approval') {
                 agent none
+                when {
+                    allOf {
+                        expression { params.prod == 'True' }
+                        expression { params.canary == 'True' }
+                    }
+                }
                 steps {
                     timeout(time: 2, unit: "MINUTES") {
-                        input message: 'Do you want to approve the deploy in production?', ok: 'Yes'
+                        input message: 'Do you want to approve the canary deploy to staging?', ok: 'Yes'
                     }
                 }
             }
+
+            stage('Check and deploy canaries') {
+                when {
+                    allOf {
+                        expression { params.prod == 'True' }
+                        expression { params.canary == 'True' }
+                    }
+                }
+                steps {
+                    script {
+                        def rel = new Release(this)
+                        rel.releaseCanary("${params.version}","${params.filepath}")
+                    }
+                }
+            }
+
+            stage('Wait for production approval') {
+                agent none
+                when {
+                    allOf {
+                        expression { params.prod == 'True' }
+                    }
+                }
+                steps {
+                    timeout(time: 2, unit: "MINUTES") {
+                        input message: 'Do you want to approve the deploy to production?', ok: 'Yes'
+                    }
+                }
+            }
+
+            stage('Check and deploy production') {
+                when {
+                    allOf {
+                        expression { params.prod == 'True' }
+                    }
+                }
+                steps {
+                    script {
+                        def rel = new Release(this)
+                        rel.releaseProduction("${params.version}","${params.filepath}")
+                    }
+                }
+            }
+
         }
 
         post {
