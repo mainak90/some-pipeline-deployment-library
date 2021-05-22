@@ -132,7 +132,7 @@ class Release implements Serializable {
         def properties = steps.readProperties file: filepath
         def projectname = properties['project']
         getOrBuildImage(projectname, version, ".")
-        steps.sh "sed manifest/$projectname/canary/staging/ -type f | xargs sed -i 's/VERSION/$version/g'"
+        steps.sh "find manifest/$projectname/canary/staging/ -type f | xargs sed -i 's/VERSION/$version/g'"
         def namespaceExists = steps.sh(returnStatus: true, script: "microk8s.kubectl get namespace canary")
         if (namespaceExists != 0) {
             steps.echo "Namespace canary does not exist, creating namespace"
@@ -169,7 +169,7 @@ class Release implements Serializable {
         def properties = steps.readProperties file: filepath
         def projectname = properties['project']
         getOrBuildImage(projectname, version, ".")
-        steps.sh "sed manifest/$projectname/canary/prod/ -type f | xargs sed -i 's/VERSION/$version/g'"
+        steps.sh "find manifest/$projectname/canary/prod/ -type f | xargs sed -i 's/VERSION/$version/g'"
         def namespaceExists = steps.sh(returnStatus: true, script: "microk8s.kubectl get namespace production")
         if (namespaceExists != 0) {
             steps.echo "Namespace production does not exist, creating namespace"
