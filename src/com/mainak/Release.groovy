@@ -81,8 +81,8 @@ class Release implements Serializable {
             }
         }
         if (properties['app'] == "java") {
-            javaTestOrBuild(("", "", "test", filepath))
-            javaTestOrBuild(("", "", "build", filepath))
+            javaTestOrBuild("", "", "test", filepath)
+            javaTestOrBuild("", "", "build", filepath)
         }
     }
 
