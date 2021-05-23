@@ -96,8 +96,8 @@ class Release implements Serializable {
                 steps.echo 'Exception occurred: ' + ex.toString()
                 steps.currentBuild.result = 'FAILURE'
         }
-        withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
-            sh("git push https://$username:$password@github.com/$reponame.git")
+        steps.withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
+            steps.sh("git push https://$username:$password@github.com/$reponame.git")
         }
     }
 
