@@ -31,7 +31,7 @@ def call(String filepath){
                 steps {
                     script{
                         def properties = steps.readProperties file: filepath
-                        def reponame = properties['reponame']
+                        def reponame = properties['repo']
                         env.REPONAME = reponame
                         echo "Bumping version set of release"
                         sh "bump2version patch --allow-dirty"
