@@ -40,8 +40,8 @@ def call(String filepath){
                     }
                     withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
                         sh "git add --all"
-                        sh "git commit -m '${env.GIT_BRANCH}'"
-                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git --tags"
+                        sh "git commit"
+                        sh "git push https://$username:$password@github.com/${env.REPONAME}.git --tags"
                     }
                 }
             }
