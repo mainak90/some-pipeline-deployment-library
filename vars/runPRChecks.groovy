@@ -29,13 +29,11 @@ def call(String filepath){
 
             stage('Tag and push') {
                 steps {
-                    script {
+                    withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
                         def properties = steps.readProperties file: filepath
                         def reponame = properties['reponame']
                         echo "Bumping version set of release"
                         sh "bump2version patch --allow-dirty"
-                    }
-                    withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
                         echo "Repo url : https://$username:$password@github.com/$reponame.git"
                         sh "/usr/bin/git push https://$username:$password@github.com/$reponame.git"
                     }
