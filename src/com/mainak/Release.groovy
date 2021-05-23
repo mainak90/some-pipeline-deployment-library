@@ -52,8 +52,8 @@ class Release implements Serializable {
             dockerBuildAndTest(properties['project'], '.', properties['testfile'])
         }
         if (properties['app'] == "java") {
-            javaTestOrBuild(("", "", "test", filepath))
-            javaTestOrBuild(("", "", "build", filepath))
+            javaTestOrBuild("", "", "test", filepath)
+            javaTestOrBuild("", "", "build", filepath)
         }
         boolean prod
         if (properties['prod'] == 'False') {
