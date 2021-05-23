@@ -33,15 +33,10 @@ def call(String filepath){
                         def properties = steps.readProperties file: filepath
                         def reponame = properties['reponame']
                         echo "Bumping version set of release"
-                        try {
-                            sh "bump2version patch --allow-dirty"
-                        } catch (Exception ex){
-                                echo 'Exception occurred: ' + ex.toString()
-                                currentBuild.result = 'FAILURE'
-                        }
+                        sh "bump2version patch --allow-dirty"
                         withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
                             echo "Repo url : https://$username:$password@github.com/$reponame.git"
-                            sh("/usr/bin/git push https://$username:$password@github.com/$reponame.git")
+                            sh "/usr/bin/git push https://$username:$password@github.com/$reponame.git"
                         }
                     }
                 }
