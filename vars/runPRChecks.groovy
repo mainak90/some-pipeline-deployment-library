@@ -36,9 +36,10 @@ def call(String filepath){
                         env.BRANCHNAME = scm.branches[0].name
                         echo "Bumping version set of release"
                         sh "bump2version patch --allow-dirty"
+                        env.NEWVER = readFile 'VERSION'
                     }
                     withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
-                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git HEAD:${env.BRANCHNAME}"
+                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git ${env.NEWVER}"
                     }
                 }
             }
