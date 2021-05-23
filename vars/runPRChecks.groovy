@@ -40,7 +40,7 @@ def call(String filepath){
                         sh "git tag ${env.NEWVER} ${env.GIT_COMMIT}"
                     }
                     withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
-                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git --tags"
+                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git --tags --force"
                     }
                 }
             }
