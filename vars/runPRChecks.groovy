@@ -40,7 +40,8 @@ def call(String filepath){
                                 currentBuild.result = 'FAILURE'
                         }
                         withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
-                            sh("git push https://$username:$password@github.com/$reponame.git")
+                            echo "Repo url : https://$username:$password@github.com/$reponame.git"
+                            sh("/usr/bin/git push https://$username:$password@github.com/$reponame.git")
                         }
                     }
                 }
