@@ -38,7 +38,7 @@ def call(String filepath){
                     }
                     withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
                         echo "Repo url : https://$username:$password@github.com/${env.REPONAME}.git"
-                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git HEAD:${env.GIT_BRANCH}"
+                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git HEAD:${env.CHANGE_BRANCH}"
                     }
                 }
             }
