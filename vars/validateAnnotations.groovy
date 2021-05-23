@@ -4,5 +4,5 @@ def call(String filename, String annotation) {
     echo "Reading manifest $fullfilename"
     def yamlfile = readYaml (file: fullfilename)
     def annotations = yamlfile.spec.template.metadata.annotations
-    return annotations.containsKey(annotation)
+    return annotations.containsKey(annotation.toString())
 }
