@@ -38,8 +38,7 @@ def call(String filepath){
                     }
                     withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
                         echo "Repo url : https://$username:$password@github.com/${env.REPONAME}.git"
-                        def branchname = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true)
-                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git HEAD:$branchname"
+                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git HEAD:${env.GIT_BRANCH}"
                     }
                 }
             }
