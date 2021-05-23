@@ -51,6 +51,10 @@ class Release implements Serializable {
         if (properties['app'] == "docker") {
             dockerBuildAndTest(properties['project'], '.', properties['testfile'])
         }
+        if (properties['app'] == "java") {
+            javaTestOrBuild(("", "", "test", filepath))
+            javaTestOrBuild(("", "", "build", filepath))
+        }
         boolean prod
         if (properties['prod'] == 'False') {
             prod = false
@@ -58,6 +62,43 @@ class Release implements Serializable {
             prod = true
         }
         deployToK8s(properties['project'], properties['namespace'], prod)
+    }
+
+    def runPRTest(String filepath){
+        steps.echo "Running PR tests on project"
+        def properties = steps.readProperties file: filepath
+        def projectname = properties['project']
+        def testfile = properties['testfile']
+        if (properties['app'] == "docker") {
+            steps.sh "docker build -t $projectname:test ."
+            steps.echo "Running unit tests..."
+            try {
+                steps.sh "container-structure-test test --image $projectname:test --config $testfile"
+                steps.currentBuild.result = 'SUCCESS'
+            } catch (Exception ex){
+                steps.echo 'Exception occurred: ' + ex.toString()
+                steps.currentBuild.result = 'FAILURE'
+            }
+        }
+        if (properties['app'] == "java") {
+            javaTestOrBuild(("", "", "test", filepath))
+            javaTestOrBuild(("", "", "build", filepath))
+        }
+    }
+
+    def tagRelease(String filepath){
+        def properties = steps.readProperties file: filepath
+        def reponame = properties['reponame']
+        steps.echo "Bumping version set of release"
+        try {
+            steps.sh "bump2version patch --allow-dirty"
+        } catch (Exception ex){
+                steps.echo 'Exception occurred: ' + ex.toString()
+                steps.currentBuild.result = 'FAILURE'
+        }
+        steps.withCredentials([usernamePassword(credentialsId: 'mainak90', usernameVariable: 'username', passwordVariable: 'password')]){
+            sh("git push https://$username:$password@github.com/$reponame.git")
+        }
     }
 
 
@@ -198,6 +239,32 @@ class Release implements Serializable {
             } catch (Exception ex) {
                 steps.echo 'Exception occurred: ' + ex.toString()
                 steps.currentBuild.result = 'UNSTABLE'
+            }
+        }
+    }
+
+    def javaTestOrBuild(String testclasses = "", String settingsfile = "", String command, String filepath) {
+        def properties = steps.readProperties file: filepath
+        if (command == "build") {
+            steps.echo "Running maven build om project ${properties['project']}"
+            if (settingsfile != "") {
+                if (properties["dockerbuild"] == "true") {
+                    steps.sh "mvn -s $settingsfile dockerfile:build"
+                } else {
+                    steps.sh "mvn -s $settingsfile build"
+                }
+            } else {
+                if (properties["dockerbuild"] == "true") {
+                    steps.sh "mvn dockerfile:build"
+                } else {
+                    steps.sh "mvn build"
+                }
+            }
+        }
+        if (command == "test"){
+            steps.echo "Running maven test om project ${properties['project']}"
+            if (testclasses != "") {
+                steps.sh "mvn -Dtest=$testclasses test"
             }
         }
     }
