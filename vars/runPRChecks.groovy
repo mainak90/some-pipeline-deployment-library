@@ -39,7 +39,7 @@ def call(String filepath){
                         env.NEWVER = readFile 'VERSION'
                     }
                     withCredentials([usernamePassword(credentialsId: "mainak90", usernameVariable: "username", passwordVariable: "password")]){
-                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git tag ${env.NEWVER} --force"
+                        sh "/usr/bin/git push https://$username:$password@github.com/${env.REPONAME}.git --tags"
                     }
                 }
             }
