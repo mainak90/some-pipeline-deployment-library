@@ -18,7 +18,7 @@ def call(){
         parameters {
             string(
                     name: 'namespace',
-                    defaultValue: 'default',
+                    defaultValue: 'nginx',
                     description: 'The namespace to deploy to'
             )
             choice(
